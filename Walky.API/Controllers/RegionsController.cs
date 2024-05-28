@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Walky.API.Data;
 using Walky.API.Models.Domain;
 using Walky.API.Models.DTO;
+using Walky.API.Repositories.IRepository;
 
 namespace Walky.API.Controllers
 {
@@ -11,17 +12,19 @@ namespace Walky.API.Controllers
     [ApiController]
     public class RegionsController : ControllerBase
     {
-        private readonly WalkyDbContext dbContext;
+        private readonly WalkyDbContext _dbContext;
+        private readonly IRegionRepository _regionRepository;
 
-        public RegionsController(WalkyDbContext dbContext)
+        public RegionsController(WalkyDbContext dbContext,IRegionRepository regionRepository)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
+            _regionRepository = regionRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var regions = await dbContext.Regions.ToListAsync();
+            var regions = await _regionRepository.GetAllAsync();
 
             var regionsDto = new List<RegionDto>();
             foreach (var item in regions)
@@ -42,7 +45,7 @@ namespace Walky.API.Controllers
         [Route("{id:guid}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            var region = await dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
+            var region = await _regionRepository.GetByIdAsync(id);
 
             if(region == null)
             {
@@ -69,8 +72,7 @@ namespace Walky.API.Controllers
                 RegionImageUrl = createRegionDto.RegionImageUrl
             };
 
-            dbContext.Regions.Add(region);
-            await dbContext.SaveChangesAsync();
+            region = await _regionRepository.CreateAsync(region);
 
             var regionDto = new RegionDto()
             {
@@ -87,18 +89,19 @@ namespace Walky.API.Controllers
         [Route("{id:guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionDto updateRegionDto)
         {
-            var region = await dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
+            var region = new Region()
+            {
+                Code = updateRegionDto.Code,
+                Name = updateRegionDto.Name,
+                RegionImageUrl = updateRegionDto.RegionImageUrl
+            };
+
+            region = await _regionRepository.UpdateAsync(id, region);
 
             if(region == null)
             {
                 return NotFound();
             }
-
-            region.Code = updateRegionDto.Code;
-            region.Name = updateRegionDto.Name;
-            region.RegionImageUrl = updateRegionDto.RegionImageUrl;
-
-            await dbContext.SaveChangesAsync();
 
             var regionDto = new RegionDto()
             {
@@ -115,15 +118,11 @@ namespace Walky.API.Controllers
         [Route("{id:guid}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            var region = await dbContext.Regions.FirstOrDefaultAsync(x => x.Id == id);
-
-            if(region == null)
+            var result = await _regionRepository.DeleteAsync(id);
+            if(!result)
             {
                 return NotFound();
             }
-
-            dbContext.Remove(region);
-            await dbContext.SaveChangesAsync();
 
             return Ok();
 
