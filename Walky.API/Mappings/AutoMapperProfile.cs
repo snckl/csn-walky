@@ -13,6 +13,7 @@ namespace Walky.API.Mappings
             CreateMap<CreateRegionDto, Region>().ReverseMap();
             CreateMap<CreateWalkDto,Walk>().ReverseMap();
             CreateMap<Walk,WalkDto>().ReverseMap();
+            CreateMap<Difficulty,DifficultyDto>().ReverseMap(); 
 
         }
     }
