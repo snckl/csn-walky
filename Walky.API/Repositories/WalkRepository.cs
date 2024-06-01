@@ -27,7 +27,7 @@ namespace Walky.API.Repositories
             return await _dbContext.Walks.Include(x => x.Difficulty).Include(x => x.Region).ToListAsync();
         }
 
-        public async Task<Walk> GetByIdAsync(Guid id)
+        public async Task<Walk?> GetByIdAsync(Guid id)
         {
            return await _dbContext.Walks.Include(x => x.Difficulty).Include(x => x.Region).FirstOrDefaultAsync(x => x.Id == id);
         }
