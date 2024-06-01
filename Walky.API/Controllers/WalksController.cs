@@ -21,9 +21,16 @@ namespace Walky.API.Controllers
             _walkRepository = walkRepository;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var walksDomain = await _walkRepository.GetAllAsync();
 
+            return Ok(_mapper.Map<List<WalkDto>>(walksDomain));
+        }
 
         [HttpPost]
+
         public async Task<IActionResult> Create([FromBody] CreateWalkDto createWalkDto)
         {
             var walkCreateDto = _mapper.Map<Walk>(createWalkDto);
@@ -33,11 +40,18 @@ namespace Walky.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Route("{id:guid}")]
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-           var walksDomain = await _walkRepository.GetAllAsync();
+            var walk = await _walkRepository.GetByIdAsync(id);
 
-           return Ok(_mapper.Map<List<WalkDto>>(walksDomain)); 
+            if(walk == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<WalkDto>(walk));
         }
+
     }
 }
