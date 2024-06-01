@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Walky.API.Data;
+using Walky.API.Mappings;
 using Walky.API.Repositories;
 using Walky.API.Repositories.IRepository;
 
@@ -14,6 +15,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<WalkyDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+builder.Services.AddScoped<IWalkRepository, WalkRepository>();
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var app = builder.Build();
 

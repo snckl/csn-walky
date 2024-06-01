@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Walky.API.Data;
@@ -14,31 +15,21 @@ namespace Walky.API.Controllers
     {
         private readonly WalkyDbContext _dbContext;
         private readonly IRegionRepository _regionRepository;
+        private readonly IMapper _mapper;
 
-        public RegionsController(WalkyDbContext dbContext,IRegionRepository regionRepository)
+        public RegionsController(WalkyDbContext dbContext,IRegionRepository regionRepository,IMapper mapper)
         {
             _dbContext = dbContext;
             _regionRepository = regionRepository;
+            _mapper = mapper;
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var regions = await _regionRepository.GetAllAsync();
 
-            var regionsDto = new List<RegionDto>();
-            foreach (var item in regions)
-            {
-                regionsDto.Add(new RegionDto()
-                {
-                    Id = item.Id,
-                    Code = item.Code,
-                    Name = item.Name,
-                    RegionImageUrl = item.RegionImageUrl
-                });   
-            }
-
-            return Ok(regionsDto);
+            return Ok(_mapper.Map<List<RegionDto>>(regions));
         }
 
         [HttpGet]
@@ -51,36 +42,15 @@ namespace Walky.API.Controllers
             {
                 return NotFound();
             }
-            var regionsDto = new RegionDto()
-            {
-                Id = region.Id,
-                Code = region.Code,
-                Name = region.Name,
-                RegionImageUrl = region.RegionImageUrl
-            };
 
-            return Ok(regionsDto);
+            return Ok(_mapper.Map<RegionDto>(region));
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRegionDto createRegionDto)
         {
-            var region =  new Region()
-            {
-                Code = createRegionDto.Code,
-                Name = createRegionDto.Name,
-                RegionImageUrl = createRegionDto.RegionImageUrl
-            };
-
-            region = await _regionRepository.CreateAsync(region);
-
-            var regionDto = new RegionDto()
-            {
-                Id = region.Id,
-                Code = region.Code,
-                Name = region.Name,
-                RegionImageUrl = region.RegionImageUrl
-            };
+            var region = await _regionRepository.CreateAsync(_mapper.Map<Region>(createRegionDto));
+            var regionDto = _mapper.Map<RegionDto>(region);
 
             return CreatedAtAction(nameof(GetById),new { id = regionDto.Id},regionDto);
         }
@@ -89,13 +59,7 @@ namespace Walky.API.Controllers
         [Route("{id:guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionDto updateRegionDto)
         {
-            var region = new Region()
-            {
-                Code = updateRegionDto.Code,
-                Name = updateRegionDto.Name,
-                RegionImageUrl = updateRegionDto.RegionImageUrl
-            };
-
+            var region = _mapper.Map<Region>(updateRegionDto);
             region = await _regionRepository.UpdateAsync(id, region);
 
             if(region == null)
@@ -103,15 +67,7 @@ namespace Walky.API.Controllers
                 return NotFound();
             }
 
-            var regionDto = new RegionDto()
-            {
-                Id = region.Id,
-                Code = region.Code,
-                Name = region.Name,
-                RegionImageUrl = region.RegionImageUrl
-            };
-
-            return Ok(regionDto);
+            return Ok(_mapper.Map<RegionDto>(region));
         }
 
         [HttpDelete]
@@ -119,6 +75,7 @@ namespace Walky.API.Controllers
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var result = await _regionRepository.DeleteAsync(id);
+
             if(!result)
             {
                 return NotFound();

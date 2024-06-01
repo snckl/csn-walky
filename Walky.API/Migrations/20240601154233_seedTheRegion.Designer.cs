@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Walky.API.Data;
 
@@ -11,9 +12,11 @@ using Walky.API.Data;
 namespace Walky.API.Migrations
 {
     [DbContext(typeof(WalkyDbContext))]
-    partial class WalkyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240601154233_seedTheRegion")]
+    partial class seedTheRegion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -367,7 +370,7 @@ namespace Walky.API.Migrations
                     b.Property<Guid>("RegionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("WalkImageUrl")
+                    b.Property<string>("WalkImagegeUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
