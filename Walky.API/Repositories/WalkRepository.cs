@@ -22,9 +22,24 @@ namespace Walky.API.Repositories
            return walk;
         }
 
-        public async Task<List<Walk>> GetAllAsync()
+        public async Task<List<Walk>> GetAllAsync(string? filterOn = null,string? filterQuery = null, string? sortBy = null)
         {
-            return await _dbContext.Walks.Include(x => x.Difficulty).Include(x => x.Region).ToListAsync();
+            var walks = _dbContext.Walks.Include(x => x.Difficulty).Include(x => x.Region).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filterOn) && !string.IsNullOrWhiteSpace(filterQuery))
+            {
+                if (filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase)){
+                    walks = walks.Where(x => x.Name.Contains(filterQuery));
+                }  
+            }
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                if(sortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = walks.OrderBy(x => x.Name);
+                }
+            }
+            return await walks.ToListAsync();
         }
 
         public async Task<Walk?> GetByIdAsync(Guid id)

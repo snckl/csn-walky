@@ -23,9 +23,9 @@ namespace Walky.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery, [FromQuery] string? sortBy)
         {
-            var walksDomain = await _walkRepository.GetAllAsync();
+            var walksDomain = await _walkRepository.GetAllAsync(filterOn,filterQuery,sortBy);
 
             return Ok(_mapper.Map<List<WalkDto>>(walksDomain));
         }
