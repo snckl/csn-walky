@@ -49,25 +49,38 @@ namespace Walky.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRegionDto createRegionDto)
         {
-            var region = await _regionRepository.CreateAsync(_mapper.Map<Region>(createRegionDto));
-            var regionDto = _mapper.Map<RegionDto>(region);
+            if (ModelState.IsValid)
+            {
+                var region = await _regionRepository.CreateAsync(_mapper.Map<Region>(createRegionDto));
+                var regionDto = _mapper.Map<RegionDto>(region);
 
-            return CreatedAtAction(nameof(GetById),new { id = regionDto.Id},regionDto);
+                return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
         }
 
         [HttpPut]
         [Route("{id:guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionDto updateRegionDto)
         {
-            var region = _mapper.Map<Region>(updateRegionDto);
-            region = await _regionRepository.UpdateAsync(id, region);
-
-            if(region == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
-            }
+                var region = _mapper.Map<Region>(updateRegionDto);
+                region = await _regionRepository.UpdateAsync(id, region);
 
-            return Ok(_mapper.Map<RegionDto>(region));
+                if (region == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(_mapper.Map<RegionDto>(region));
+            } else
+            {
+                return BadRequest(ModelState);
+            }
         }
 
         [HttpDelete]
