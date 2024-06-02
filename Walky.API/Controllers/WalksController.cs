@@ -29,28 +29,33 @@ namespace Walky.API.Controllers
             return Ok(_mapper.Map<List<WalkDto>>(walksDomain));
         }
 
-        [HttpPost]
-
-        public async Task<IActionResult> Create([FromBody] CreateWalkDto createWalkDto)
-        {
-            var walkCreateDto = _mapper.Map<Walk>(createWalkDto);
-            var walk = await _walkRepository.CreateAsync(walkCreateDto);
-
-            return Ok(_mapper.Map<WalkDto>(walk));
-        }
-
         [HttpGet]
         [Route("{id:guid}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var walk = await _walkRepository.GetByIdAsync(id);
 
-            if(walk == null)
+            if (walk == null)
             {
                 return NotFound();
             }
 
             return Ok(_mapper.Map<WalkDto>(walk));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateWalkDto createWalkDto)
+        {
+            if (ModelState.IsValid)
+            {
+                var walkCreateDto = _mapper.Map<Walk>(createWalkDto);
+                var walk = await _walkRepository.CreateAsync(walkCreateDto);
+
+                return Ok(_mapper.Map<WalkDto>(walk));
+            } else
+            {
+                return BadRequest(ModelState);
+            }
         }
 
         [HttpPut]
