@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Walky.API.CustomActionFilters;
 using Walky.API.Models.Domain;
 using Walky.API.Models.DTO;
 using Walky.API.Repositories.IRepository;
@@ -44,18 +45,13 @@ namespace Walky.API.Controllers
         }
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> Create([FromBody] CreateWalkDto createWalkDto)
         {
-            if (ModelState.IsValid)
-            {
                 var walkCreateDto = _mapper.Map<Walk>(createWalkDto);
                 var walk = await _walkRepository.CreateAsync(walkCreateDto);
 
                 return Ok(_mapper.Map<WalkDto>(walk));
-            } else
-            {
-                return BadRequest(ModelState);
-            }
         }
 
         [HttpPut]

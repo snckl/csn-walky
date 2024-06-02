@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Walky.API.CustomActionFilters;
 using Walky.API.Data;
 using Walky.API.Models.Domain;
 using Walky.API.Models.DTO;
@@ -47,27 +48,20 @@ namespace Walky.API.Controllers
         }
 
         [HttpPost]
+        [ValidateModel]
         public async Task<IActionResult> Create([FromBody] CreateRegionDto createRegionDto)
         {
-            if (ModelState.IsValid)
-            {
                 var region = await _regionRepository.CreateAsync(_mapper.Map<Region>(createRegionDto));
                 var regionDto = _mapper.Map<RegionDto>(region);
 
                 return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }
         }
 
         [HttpPut]
         [Route("{id:guid}")]
+        [ValidateModel]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionDto updateRegionDto)
         {
-            if (ModelState.IsValid)
-            {
                 var region = _mapper.Map<Region>(updateRegionDto);
                 region = await _regionRepository.UpdateAsync(id, region);
 
@@ -77,10 +71,6 @@ namespace Walky.API.Controllers
                 }
 
                 return Ok(_mapper.Map<RegionDto>(region));
-            } else
-            {
-                return BadRequest(ModelState);
-            }
         }
 
         [HttpDelete]
