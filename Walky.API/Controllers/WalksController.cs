@@ -68,5 +68,19 @@ namespace Walky.API.Controllers
             return Ok(_mapper.Map<WalkDto>(walk));
         }
 
+        [HttpDelete]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+          var result = await _walkRepository.RemoveAsync(id);
+
+          if (result)
+          {
+              return NotFound();
+          }
+
+          return NoContent();
+        }
+
     }
 }

@@ -51,5 +51,21 @@ namespace Walky.API.Repositories
 
             return walkDb;
         }
+
+
+        public async Task<bool> RemoveAsync(Guid id)
+        {
+            var walkDb = await _dbContext.Walks.FirstOrDefaultAsync(x => x.Id == id);
+
+            if(walkDb == null)
+            {
+                return false;
+            }
+
+            _dbContext.Remove(walkDb);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

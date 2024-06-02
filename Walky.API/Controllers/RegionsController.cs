@@ -81,7 +81,7 @@ namespace Walky.API.Controllers
                 return NotFound();
             }
 
-            return Ok();
+            return NoContent();
 
         }
     }
