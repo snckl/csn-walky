@@ -53,5 +53,20 @@ namespace Walky.API.Controllers
             return Ok(_mapper.Map<WalkDto>(walk));
         }
 
+        [HttpPut]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateWalkDto updateWalkDto)
+        {
+            var walk = _mapper.Map<Walk>(updateWalkDto);
+            walk = await _walkRepository.UpdateAsync(id,walk);
+
+            if(walk == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<WalkDto>(walk));
+        }
+
     }
 }
