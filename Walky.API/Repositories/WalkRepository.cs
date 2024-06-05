@@ -22,7 +22,7 @@ namespace Walky.API.Repositories
            return walk;
         }
 
-        public async Task<List<Walk>> GetAllAsync(string? filterOn = null,string? filterQuery = null, string? sortBy = null)
+        public async Task<List<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null, string? sortBy = null, int pageNumber = 1, int pageSize = 25 )
         {
             var walks = _dbContext.Walks.Include(x => x.Difficulty).Include(x => x.Region).AsQueryable();
 
@@ -39,7 +39,8 @@ namespace Walky.API.Repositories
                     walks = walks.OrderBy(x => x.Name);
                 }
             }
-            return await walks.ToListAsync();
+
+            return await walks.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
         public async Task<Walk?> GetByIdAsync(Guid id)
