@@ -6,7 +6,7 @@ using Walky.API.Repositories.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Services
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -20,7 +20,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
