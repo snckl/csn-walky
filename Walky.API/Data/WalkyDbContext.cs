@@ -5,7 +5,7 @@ namespace Walky.API.Data
 {
     public class WalkyDbContext : DbContext
     {
-        public WalkyDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        public WalkyDbContext(DbContextOptions<WalkyDbContext> dbContextOptions) : base(dbContextOptions)
         {
             
         }
