@@ -22,6 +22,7 @@ builder.Services.AddDbContext<WalkyAuthDbContext>(options => options.UseSqlServe
 
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IWalkRepository, WalkRepository>();
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

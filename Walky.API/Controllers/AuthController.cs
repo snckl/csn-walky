@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Walky.API.Models.DTO;
+using Walky.API.Repositories.IRepository;
 
 namespace Walky.API.Controllers
 {
@@ -12,10 +13,12 @@ namespace Walky.API.Controllers
     {
 
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ITokenRepository _tokenRepository;
 
-        public AuthController(UserManager<IdentityUser> userManager)
+        public AuthController(UserManager<IdentityUser> userManager,ITokenRepository tokenRepository)
         {
             this._userManager = userManager;
+            this._tokenRepository = tokenRepository;
         }
 
         [HttpPost]
@@ -45,5 +48,35 @@ namespace Walky.API.Controllers
 
             return BadRequest("Something went wrong!");
         }
+
+        [HttpPost]
+        [Route("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        {
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+
+            if(user != null)
+            {
+                var passwordResult = await _userManager.CheckPasswordAsync(user,loginDto.Password);
+
+                if (passwordResult)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+
+                    if (roles != null)
+                    {
+                        var  jwt = _tokenRepository.CreateJWTToken(user,roles.ToList());
+                        return Ok(jwt);
+                    }
+
+                }
+            }
+
+            return BadRequest("Email or password incorrect");
+
+        }
+
+
+
     }
 }
